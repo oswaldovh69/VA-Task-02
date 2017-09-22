@@ -11,7 +11,10 @@
 			{eps_name: "Salud Total EPS", indicador:66}, 
 			{eps_name: "Colsubsidio", indicador:64}];
 
+//.... agregar aqui los otros json array
 
+function draw(data_array, chart_name, data_key, data_value){
+	
 var height = 300,
 	width = 500,
 	barWidth = 10,
@@ -30,20 +33,19 @@ var xBandScale = d3.scaleBand()
 	.domain(d3.range(0, items))
 	.range([0, height])
 	.paddingInner(0);
-
+	
 var tooltip = 	d3.select('body').append('div')
 					.style('position', 'absolute')
 					.style('padding', '0 10 px')
 					.style('background', 'white')
 					.style('opacity', 0);
-var	tempColor;
-
-var myChar = d3.select('#chart_satisfaccion')
+	
+var myChar = d3.select(chart_name)
 			  .append('svg')
 				.attr('width', width)
 				.attr('height', height)
 				.style('background', '#C9D7D6')
-				.selectAll('rect').data(bardata)
+				.selectAll('rect').data(data_array)
 				.enter().append('rect')
 					.style('fill', function(d,i) {
 								return colors(i);
@@ -58,11 +60,9 @@ var myChar = d3.select('#chart_satisfaccion')
 						tooltip.transition()
 							.style('opacity', .9)
 						
-						tooltip.html(d.eps_name + " - " + d.indicador + " %")
+						tooltip.html(d[data_key] + " - " + d[data_value] + " %")
 							.style('left', (d3.event.pageX - 35) + 'px')
 							.style('top', (d3.event.pageY - 30) + 'px')
-						
-						tempColor = this.style.fill;
 						d3.select(this)
 							.style('opacity', .5)
 							.style('fill', 'yellow')
@@ -70,9 +70,9 @@ var myChar = d3.select('#chart_satisfaccion')
 					.on('mouseout', function (d, i) {
 						d3.select(this)
 							.style('opacity', 1)
-							.style('fill', tempColor)
-						});
-						
+							.style('fill', this.style.fill)
+						});	
+
 myChar.transition()
 	.attr('height', function (d) {
 			return yScale(d.indicador);
@@ -84,4 +84,11 @@ myChar.transition()
 		return i * 20;
 		})
 	.duration(1000)
-	.ease('elastic');
+	.ease('elastic');	
+}
+
+/***
+llamar luego...
+draw(bardata, '#chart_satisfaccion', 'eps_name', 'indicador');
+**/
+						
